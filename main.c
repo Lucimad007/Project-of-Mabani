@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "helper_windows.h"
 #include "colorize.h"
 #define clear() system("cls")
@@ -23,10 +24,12 @@ void my_callback_on_key_arrival(char c);
 
 void MainMenu();
 void SignInMenu();
+void Register();
+void createFilesOfWords();
 
 int main()
 {
-
+   createFilesOfWords();
   //Example codes.
   MainMenu();
   //clear();
@@ -220,10 +223,56 @@ void Register(){
 
     gotoxy(0,(HEIGHT)+2);
     FILE* file = fopen("users.bin","ab");
-
     fwrite(&user, sizeof(User), 1, file);
 
     clear();
     fclose(file);
     return;
+}
+void createFilesOfWords(){
+    FILE* file = fopen("normal.txt","w");
+    char arr[43] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8','9','0','_','@','%','$','^','&','!'};
+    char word[11];
+    char LongWord[21];
+    char HardWord[21];
+
+    srand(time(NULL));
+
+    for(int i=0;i<100;i++)
+    {
+        int x = rand()%8 + 3;
+        int j=0;
+        for( ;j<x;j++)
+            word[j] = arr[rand()%36];
+        word[j] = '\0';
+        fputs(word, file);
+        fprintf(file,"\n");
+    }
+    fclose(file);
+
+    file = fopen("long.txt","w");
+    for(int i=0;i<100;i++)
+    {
+        int x = rand()%11 + 10;
+        int j=0;
+        for( ;j<x;j++)
+            LongWord[j] = arr[rand()%36];
+        LongWord[j] = '\0';
+        fputs(LongWord, file);
+        fprintf(file,"\n");
+    }
+    fclose(file);
+
+    file = fopen("hard.txt","w");
+    for(int i=0;i<100;i++)
+    {
+        int x = rand()%11 + 10;
+        int j=0;
+        for( ;j<x;j++)
+            HardWord[j] = arr[rand()%43];
+        HardWord[j] = '\0';
+        fputs(HardWord, file);
+        fprintf(file,"\n");
+    }
+    fclose(file);
 }
