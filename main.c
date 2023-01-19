@@ -7,6 +7,14 @@
 #define clear() system("cls")
 enum Difficulity {EASY, MEDIUM, HARD};
 typedef enum Difficulity Difficulity;
+
+struct Node{
+    char word[21];
+    struct Node* next;
+};
+typedef struct Node* NodePtr;
+typedef struct Node Node;
+
 struct User{
     char name[20];
     char family[20];
@@ -15,6 +23,7 @@ struct User{
     char password[20];
 };
 typedef struct User User;
+
 struct Data{
     char nickName[20];
     int score;
@@ -29,6 +38,8 @@ typedef enum situation situation;
 User user;
 situation flag = MAIN_MENU;
 FILE* users;
+NodePtr head = NULL;
+int countOfWords = 0;
 
 void my_callback_on_key_arrival(char c);
 
@@ -37,10 +48,23 @@ void SignInMenu();
 void Register();
 void selectLevelMenu();
 void createFilesOfWords();
+NodePtr createNode();
+void addWord(char word[]);
+void deleteWord();
 
 int main()
 {
-   createFilesOfWords();
+ //  createFilesOfWords();
+ //  addWord("ali");
+ //  addWord("mmd");
+  // addWord("hole");
+  // deleteWord();
+  // addWord("last");
+ //  while(head!=NULL){
+    //    printf("%s\n",head->word);
+   //     head = head->next;
+  // }
+//printf("counts: %d\n", countOfWords);
    //Data data1,data2,data3;
    //data1.score = 300; data2.score = 400; data3.score =350; FILE *file = fopen("ali.bin","wb"); data1.level = HARD;
   // data2.level = MEDIUM; data3.level = EASY;data1.date = time(NULL);data2.date = time(NULL);data3.date = time(NULL);
@@ -49,7 +73,7 @@ int main()
    //fwrite(&data3, sizeof(Data), 1, file);
    //fclose(file);
   //Example codes.
-  MainMenu();
+   MainMenu();
   //clear();
   HANDLE thread_id = start_listening(my_callback_on_key_arrival);
 
@@ -378,4 +402,31 @@ void createFilesOfWords(){
         fprintf(file,"\n");
     }
     fclose(file);
+}
+
+NodePtr createNode(){
+    NodePtr temp = (NodePtr)malloc(sizeof(Node));
+    temp->next = NULL;
+    strcpy(temp->word, "");
+    return temp;
+}
+void addWord(char word[]){
+    if(head==NULL){
+        head = createNode();
+        strcpy(head->word, word);
+        countOfWords++;
+        return;
+    }
+    NodePtr temp = head;
+    while(head->next != NULL)
+        head = head->next;
+    head->next = createNode();
+    strcpy(head->next->word, word);
+    head = temp;
+    countOfWords++;
+    return;
+}
+void deleteWord(){
+    head = head->next;
+    countOfWords--;
 }
