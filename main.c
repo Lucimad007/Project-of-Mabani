@@ -65,12 +65,12 @@ int main()
    //     head = head->next;
   // }
 //printf("counts: %d\n", countOfWords);
-   //Data data1,data2,data3;
-   //data1.score = 300; data2.score = 400; data3.score =350; FILE *file = fopen("ali.bin","wb"); data1.level = HARD;
+  // Data data1,data2,data3;
+ // data1.score = 300; data2.score = 400; data3.score =350; FILE *file = fopen("ali.bin","wb"); data1.level = HARD;
   // data2.level = MEDIUM; data3.level = EASY;data1.date = time(NULL);data2.date = time(NULL);data3.date = time(NULL);
   // fwrite(&data1, sizeof(Data), 1, file);
-  // fwrite(&data2, sizeof(Data), 1, file);
-   //fwrite(&data3, sizeof(Data), 1, file);
+  //fwrite(&data2, sizeof(Data), 1, file);
+  // fwrite(&data3, sizeof(Data), 1, file);
    //fclose(file);
   //Example codes.
    MainMenu();
@@ -333,12 +333,14 @@ void selectLevelMenu(){
         gotoxy(46, HEIGHT/2 + 2);
         printf("Difficulity");
 
+        if(!feof(file))
+            fseek(file,(-1)*sizeof(Data),SEEK_END);
         for(int i=1;i<=3;i++){
             if(feof(file))
                 break;
             fread(&data ,sizeof(Data), 1, file);
             gotoxy(3, HEIGHT/2 + i*2 + 2);
-            printf("%d. %d",i,data.score);
+            printf("%d. %d",i+3,data.score);
             gotoxy(15, HEIGHT/2 + i*2 + 2);
             char *date = ctime(&data.date);
             printf("%s",date);
@@ -349,6 +351,8 @@ void selectLevelMenu(){
                 printf("medium");
             else if(data.level == HARD)
                 printf("hard");
+
+            fseek(file,(-2)*sizeof(Data),SEEK_CUR);
         }
     }
 
