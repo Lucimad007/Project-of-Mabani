@@ -32,7 +32,7 @@ struct Data{
 };
 typedef struct Data Data;
 
-enum situation {MAIN_MENU, SIGN_IN_MENU, REGISTER_MENU, SELECT_LEVEL, GAME};
+enum situation {MAIN_MENU, SIGN_IN_MENU, REGISTER_MENU, START_MENU, SELECT_LEVEL, GAME};
 typedef enum situation situation;
 
 User user;
@@ -40,6 +40,9 @@ situation flag = MAIN_MENU;
 FILE* users;
 NodePtr head = NULL;
 int countOfWords = 0;
+int Current_Score = 0;
+int Time_Period = 0;
+int Wave = 0;
 
 void my_callback_on_key_arrival(char c);
 
@@ -48,6 +51,8 @@ void SignInMenu();
 void Register();
 void selectLevelMenu();
 void createFilesOfWords();
+void startButton();
+void startGame();
 NodePtr createNode();
 void addWord(char word[]);
 void deleteWord();
@@ -90,11 +95,95 @@ void my_callback_on_key_arrival(char c)
             clear();
             flag = SIGN_IN_MENU;
             SignInMenu();
+            flag = SELECT_LEVEL;
+            selectLevelMenu();
         } else if(c == '2'){
             clear();
             flag = REGISTER_MENU;
             Register();
+            flag = SELECT_LEVEL;
+            selectLevelMenu();
         }
+    }else if(flag == SELECT_LEVEL){
+
+        FILE* temp = fopen(strcat(user.nickName,".bin"),"rb");
+        switch (c){
+            case '1':
+                Wave = 1;
+                Current_Score = 0;
+                Time_Period = 10;
+                break;
+            case '2':
+                Wave = 1;
+                Current_Score = 0;
+                Time_Period = 8;
+                break;
+            case '3':
+                Wave = 1;
+                Current_Score = 0;
+                Time_Period = 5;
+                break;
+            case '4':
+                if(!feof(temp))
+                {
+                    Data tempData;
+                    fseek(temp, (-1)*sizeof(Data), SEEK_END);
+                    fread(&tempData, sizeof(Data), 1, temp);
+                    Wave = 1;
+                    Current_Score = tempData.score;
+                    if(tempData.level == EASY)
+                        Time_Period = 10;
+                    else if(tempData.level == MEDIUM)
+                        Time_Period = 8;
+                    else if(tempData.level == HARD)
+                        Time_Period = 5;
+                }
+                break;
+            case '5':
+                if(!feof(temp))
+                {
+                    Data tempData;
+                    fseek(temp, (-1)*sizeof(Data), SEEK_END);
+                    fread(&tempData, sizeof(Data), 1, temp);
+                    Wave = 1;
+                    Current_Score = tempData.score;
+                    if(tempData.level == EASY)
+                        Time_Period = 10;
+                    else if(tempData.level == MEDIUM)
+                        Time_Period = 8;
+                    else if(tempData.level == HARD)
+                        Time_Period = 5;
+                }
+                break;
+            case '6':
+                if(!feof(temp))
+                {
+                    Data tempData;
+                    fseek(temp, (-1)*sizeof(Data), SEEK_END);
+                    fread(&tempData, sizeof(Data), 1, temp);
+                    Wave = 1;
+                    Current_Score = tempData.score;
+                    if(tempData.level == EASY)
+                        Time_Period = 10;
+                    else if(tempData.level == MEDIUM)
+                        Time_Period = 8;
+                    else if(tempData.level == HARD)
+                        Time_Period = 5;
+                }
+                break;
+            default:
+                break;
+        }
+        flag = START_MENU;
+        clear();
+        startButton();
+    }else if(flag == START_MENU){
+        clear();
+        if(c == '\n')
+            flag = GAME;
+
+    } else if(flag == GAME){
+        startGame();
     }
 
 
@@ -190,10 +279,8 @@ void SignInMenu(){
                 if(strcmp(temp.password , Password) == 0)
                     {
                         user = temp;
-                        flag = SELECT_LEVEL;
                         clear();
                         fclose(file);
-                        selectLevelMenu();
                         return;
                     }
         }
@@ -270,10 +357,8 @@ void Register(){
     fwrite(&temp, sizeof(User), 1, file);
 
     user = temp;
-    flag = SELECT_LEVEL;
     clear();
     fclose(file);
-    selectLevelMenu();
     return;
 }
 ////////////////////////////////////////////////////////////
@@ -358,6 +443,35 @@ void selectLevelMenu(){
 
     gotoxy(0,HEIGHT+3);
     fclose(file);
+    return;
+}
+void startButton(){
+    int WIDTH = 40;
+    int HEIGHT = 26;
+
+    setcolor(5);
+    for(int i=1;i<=HEIGHT;i++)
+    {
+        for(int j=1;j<=WIDTH;j++)
+        {
+            if((j == 1) || (j == WIDTH) || (i == HEIGHT) || (i == 1))
+            {
+                 printf("%c",(char)6);
+            } else
+                printf(" ");
+        }
+        printf("\n");
+    }
+
+    setcolor(7);
+    char str[22] = "Press Enter to Start!";
+    gotoxy((WIDTH-strlen(str))/2, HEIGHT/2);
+    printf("%s",str);
+
+    return;
+}
+void startGame(){
+    clear();
 }
 ////////////////////////////////////////////////////////////
 void createFilesOfWords(){
@@ -440,4 +554,3 @@ void deleteWord(){
     head = head->next;
     countOfWords--;
 }
-
