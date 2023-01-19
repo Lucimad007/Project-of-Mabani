@@ -54,7 +54,7 @@ void deleteWord();
 
 int main()
 {
- //  createFilesOfWords();
+   createFilesOfWords();
  //  addWord("ali");
  //  addWord("mmd");
   // addWord("hole");
@@ -395,15 +395,21 @@ void createFilesOfWords(){
     {
         int x = rand()%11 + 10;
         int j=0;
-        for( ;j<x;j++)
+        for( ;j<x;j++){
+            if((j%3 == 2) && (j+1 != x)){
+                HardWord[j] = arr[rand()%7 + 36];
+                continue;
+            }
             HardWord[j] = arr[rand()%43];
+        }
+
         HardWord[j] = '\0';
         fputs(HardWord, file);
         fprintf(file,"\n");
+
     }
     fclose(file);
 }
-
 NodePtr createNode(){
     NodePtr temp = (NodePtr)malloc(sizeof(Node));
     temp->next = NULL;
@@ -430,3 +436,4 @@ void deleteWord(){
     head = head->next;
     countOfWords--;
 }
+
