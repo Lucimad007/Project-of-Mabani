@@ -112,19 +112,28 @@ void my_callback_on_key_arrival(char c)
                 Wave = 1;
                 Current_Score = 0;
                 Time_Period = 10;
+                flag = START_MENU;
+                clear();
+                startButton();
                 break;
             case '2':
                 Wave = 1;
                 Current_Score = 0;
                 Time_Period = 8;
+                flag = START_MENU;
+                clear();
+                startButton();
                 break;
             case '3':
                 Wave = 1;
                 Current_Score = 0;
                 Time_Period = 5;
+                flag = START_MENU;
+                clear();
+                startButton();
                 break;
             case '4':
-                if(!feof(temp))
+                if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
                     fseek(temp, (-1)*sizeof(Data), SEEK_END);
@@ -137,10 +146,14 @@ void my_callback_on_key_arrival(char c)
                         Time_Period = 8;
                     else if(tempData.level == HARD)
                         Time_Period = 5;
+
+                    flag = START_MENU;
+                    clear();
+                    startButton();
                 }
                 break;
             case '5':
-                if(!feof(temp))
+                if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
                     fseek(temp, (-1)*sizeof(Data), SEEK_END);
@@ -153,10 +166,14 @@ void my_callback_on_key_arrival(char c)
                         Time_Period = 8;
                     else if(tempData.level == HARD)
                         Time_Period = 5;
+
+                    flag = START_MENU;
+                    clear();
+                    startButton();
                 }
                 break;
             case '6':
-                if(!feof(temp))
+                if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
                     fseek(temp, (-1)*sizeof(Data), SEEK_END);
@@ -169,14 +186,16 @@ void my_callback_on_key_arrival(char c)
                         Time_Period = 8;
                     else if(tempData.level == HARD)
                         Time_Period = 5;
+
+                    flag = START_MENU;
+                    clear();
+                    startButton();
                 }
                 break;
             default:
                 break;
         }
-        flag = START_MENU;
-        clear();
-        startButton();
+
     }else if(flag == START_MENU){
         clear();
         if(c == '\n')
@@ -472,6 +491,22 @@ void startButton(){
 }
 void startGame(){
     clear();
+    int WIDTH = 36;
+    int HEIGHT = 26;
+
+    setcolor(7);
+    for(int i=1;i<=HEIGHT;i++)
+    {
+        for(int j=1;j<=WIDTH;j++)
+        {
+            if((j == 1) || (j == WIDTH) || (i == HEIGHT) || (i == 1))
+            {
+                 printf("%c",(char)6);
+            } else
+                printf(" ");
+        }
+        printf("\n");
+    }
 }
 ////////////////////////////////////////////////////////////
 void createFilesOfWords(){
