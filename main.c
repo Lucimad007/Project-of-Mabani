@@ -41,7 +41,7 @@ FILE* users;
 NodePtr head = NULL;
 int countOfWords = 0;
 int Current_Score = 0;
-int Time_Period = 0;
+double Time_Period = 0;
 int Wave = 0;
 
 void my_callback_on_key_arrival(char c);
