@@ -196,12 +196,7 @@ void my_callback_on_key_arrival(char c)
                 break;
         }
 
-    }else if(flag == START_MENU){
-        clear();
-        if(c == '\n')
-            flag = GAME;
-
-    } else if(flag == GAME){
+    }else if(flag == GAME){
         startGame();
     }
 
@@ -486,7 +481,7 @@ void startButton(){
     char str[22] = "Press Enter to Start!";
     gotoxy((WIDTH-strlen(str))/2, HEIGHT/2);
     printf("%s",str);
-
+    flag = GAME;
     return;
 }
 void startGame(){
@@ -507,6 +502,7 @@ void startGame(){
         }
         printf("\n");
     }
+
 }
 ////////////////////////////////////////////////////////////
 void createFilesOfWords(){
