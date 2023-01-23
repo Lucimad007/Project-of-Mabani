@@ -11,6 +11,7 @@ enum Difficulity {EASY, MEDIUM, HARD};
 typedef enum Difficulity Difficulity;
 
 struct Node{
+    bool Mobham;
     char word[21];
     struct Node* next;
 };
@@ -75,19 +76,20 @@ void showDetails();
 void Winner();
 void Loser();
 void newWave();
+void addNormalWord();
+void addLongWord();
+void addHardWord();
+void addMobhamWord();
 void overWriteHistory(Data data);  //stands for position
-//void isMobham();
 NodePtr createNode();
-void addWord(char word[]);
+void addWord(char word[], bool isMobham);
 void deleteWord();
 
 int main()
 {
    createFilesOfWords();
-
-    for(int i =0;i<10;i++)
-        addWord("ali");
    MainMenu();
+   newWave();   // to add first words and get ready for begining of the game
     HANDLE thread_id = start_listening(my_callback_on_key_arrival);
 
     while(1){
@@ -619,8 +621,18 @@ void clearDisplay(){
     NodePtr tempPtr = head;
     setcolor(0);
     while(temp>0 && tempPtr != NULL){
-        gotoxy((width-strlen(tempPtr->word))/2 , temp);
-        printf("%s",tempPtr->word);
+        if(tempPtr->Mobham)
+        {
+            for(int i=1;i<width;i++)
+            {
+                gotoxy(i,temp);
+                printf("*");
+            }
+        } else{
+            gotoxy((width-strlen(tempPtr->word))/2 , temp);
+            printf("%s",tempPtr->word);
+        }
+
         temp--;
         tempPtr = tempPtr->next;
     }
@@ -633,8 +645,17 @@ void updateDisplay(){
     NodePtr tempPtr = head->next;
     setcolor(7);
     while(temp>0 && tempPtr != NULL){
-        gotoxy((width-strlen(tempPtr->word))/2 , temp);
-        printf("%s",tempPtr->word);
+        if(tempPtr->Mobham)
+        {
+            for(int i=1;i<width;i++)
+            {
+                gotoxy(i,temp);
+                printf("*");
+            }
+        } else{
+            gotoxy((width-strlen(tempPtr->word))/2 , temp);
+            printf("%s",tempPtr->word);
+        }
         temp--;
         tempPtr = tempPtr->next;
     }
@@ -715,14 +736,19 @@ void Winner(){
     setcolor(2);
     printf("%s%d", message2,Current_Score);
 
-    gotoxy(0 , height + 1);
+    for(int i=5;i>0;i--){
+        gotoxy(width/2 , height/2 +3);
+        printf("%d",i);
+        gotoxy(0 , height + 1);
 
-    usleep(5000000);
+        usleep(1000000);
+    }
     clear();
     exit(0);
 }
 void Loser(){
     clear();
+    createDisplay();
     char message[12] = "You Failed!";
     char message2[8] = "Wave : ";
     char message3[9] = "Score : ";
@@ -754,9 +780,14 @@ void Loser(){
     else if(curLevel == HARD)
         printf("Hard");
 
-    gotoxy(0 , height + 1);
+    for(int i=5;i>0;i--){
+        gotoxy(width/2 , height/2 + 5);
+        printf("%d",i);
 
-    usleep(5000000);
+        gotoxy(0 , height + 1);
+        usleep(1000000);
+    }
+
     clear();
     exit(0);
 }
@@ -767,89 +798,43 @@ void newWave(){
         return;
 
     Wave++;
-    FILE* file ;
-    srand(time(NULL));
-    int x;
-    char word[20];
+
     switch (Wave){
         case 1:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
-            }
-            fclose(file);
+            for(int i = 0;i<10;i++)
+            addNormalWord();
             break;
         case 2:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
+            for(int i = 0;i<10;i++)
+            {
+                if(i%2 == 0)
+                    addNormalWord();
+                else
+                    addLongWord();
             }
-            fclose(file);
             break;
         case 3:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
+            for(int i = 0;i<10;i++)
+            {
+                if(i%3 == 0)
+                    addNormalWord();
+                else if(i%3 == 1)
+                    addLongWord();
+                else
+                    addHardWord();
             }
-            fclose(file);
             break;
-        case 4:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
+
+        default:                 //4th Wave and later
+            for(int i = 0;i<10;i++)
+            {
+                if(i%3 == 0)
+                    addLongWord();
+                else if(i%3 == 1)
+                    addHardWord();
+                else
+                    addMobhamWord();
             }
-            fclose(file);
-            break;
-        case 5:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
-            }
-            fclose(file);
-            break;
-        default:
-            file = fopen("normal.txt","r");
-            x = rand()%100;
-            for(int i=0;i<10;i++){
-                for(int j=0;j<x;j++){
-                    fscanf(file,"%s", word);
-                }
-                addWord(word);
-                x = rand()%100;
-                rewind(file);
-            }
-            fclose(file);
-            break;
             break;
     }
 }
@@ -941,23 +926,114 @@ void createFilesOfWords(){
     }
     fclose(file);
 }
+void addNormalWord(){
+    FILE* file ;
+    char word[20];
+    int x;
+    file = fopen("normal.txt","r");
+    x = rand()%100;
+    for(int j=0;j<x;j++){
+        fscanf(file,"%s", word);
+    }
+    addWord(word,false);
+
+    close(file);
+}
+void addLongWord(){
+    FILE* file ;
+    char word[20];
+    int x;
+    file = fopen("long.txt","r");
+    x = rand()%100;
+    for(int j=0;j<x;j++){
+        fscanf(file,"%s", word);
+    }
+    addWord(word,false);
+
+    close(file);
+}
+void addHardWord(){
+    FILE* file ;
+    char word[20];
+    int x;
+    file = fopen("hard.txt","r");
+    x = rand()%100;
+    for(int j=0;j<x;j++){
+        fscanf(file,"%s", word);
+    }
+    addWord(word,false);
+
+    close(file);
+}
+void addMobhamWord(){
+    int rnd = rand()%3;
+    if(rnd == 0){
+        FILE* file ;
+        char word[20];
+        int x;
+        file = fopen("normal.txt","r");
+        x = rand()%100;
+        for(int j=0;j<x;j++){
+            fscanf(file,"%s", word);
+        }
+
+        addWord(word,true);
+
+        close(file);
+    } else if(rnd == 1){
+        FILE* file ;
+        char word[20];
+        int x;
+        file = fopen("hard.txt","r");
+        x = rand()%100;
+        for(int j=0;j<x;j++){
+            fscanf(file,"%s", word);
+        }
+        addWord(word,true);
+
+        close(file);
+    } else if(rnd == 2){
+        FILE* file ;
+        char word[20];
+        int x;
+        file = fopen("hard.txt","r");
+        x = rand()%100;
+        for(int j=0;j<x;j++){
+            fscanf(file,"%s", word);
+        }
+        addWord(word,true);
+
+        close(file);
+    }
+}
 NodePtr createNode(){
     NodePtr temp = (NodePtr)malloc(sizeof(Node));
     temp->next = NULL;
+    temp->Mobham = false;
     strcpy(temp->word, "");
     return temp;
 }
-void addWord(char word[]){
+void addWord(char word[], bool isMobham){
     if(head==NULL){
         head = createNode();
         strcpy(head->word, word);
+        if(isMobham)
+            head->Mobham = true;
+        else
+            head->Mobham = false;
         return;
     }
+
     NodePtr temp = head;
     while(head->next != NULL)
         head = head->next;
     head->next = createNode();
     strcpy(head->next->word, word);
+    if(isMobham)
+            head->Mobham = true;
+        else
+            head->Mobham = false;
+
     head = temp;
     return;
 }
