@@ -75,7 +75,7 @@ void showDetails();
 void Winner();
 void Loser();
 void newWave();
-void overWriteHistory(Data data, int pos);  //stands for position
+void overWriteHistory(Data data);  //stands for position
 //void isMobham();
 NodePtr createNode();
 void addWord(char word[]);
@@ -121,6 +121,9 @@ int main()
                 Time_Period *= 0.7;
             else if(curLevel == EASY)
                 Time_Period *= 0.8;
+
+            if(Time_Period<1)
+                Time_Period = 1;
             Word_Counter = 0;
         }
 
@@ -264,10 +267,14 @@ void my_callback_on_key_arrival(char c)
             default:
                 break;
         }
+        fclose(temp);
 
     }else if(flag == GAME){
         createDisplay();
+        while(IN_PROGRESS){}
+        IN_PROGRESS = 1;
         showDetails();
+        IN_PROGRESS = 0;
         flag = IN_GAME;
     } else if((flag == IN_GAME)&&(head!=NULL)&&(y>1)){
         SizeOfCurrentWord = strlen(head->word);
@@ -562,7 +569,7 @@ void selectLevelMenu(){
             //fseek(file,(-2)*sizeof(Data),SEEK_CUR);    // i did't use this because i wanted to fix a bug!
             fseek(file,(-1)*sizeof(Data),SEEK_CUR);
             long x = ftell(file);
-            if(x == 0 || x == 1)
+            if(x == 0)
                 break;
             fseek(file,(-1)*sizeof(Data),SEEK_CUR);
         }
@@ -639,11 +646,11 @@ void  updateHead(){
     gotoxy((width-len)/2 , y);
     for(int i=0;i<len;i++){
         if(colors[i] == 1)
-            setcolor(2);
+            setcolor(4);
         if(colors[i] == 0)
             setcolor(7);
         if(colors[i] == -1)
-            setcolor(1);
+            setcolor(6);
         printf("%c",head->word[i]);
     }
 }
@@ -686,8 +693,11 @@ void showDetails(){
 }
 void Winner(){
     clear();
-    gotoxy(width/2, height/2);
-    setcolor(2);
+    createDisplay();
+
+    char message[36] = "You are really good at this game!";
+    char message2[9] = "score : ";
+
     IN_PROGRESS = 1;
 
     Data data;
@@ -695,9 +705,21 @@ void Winner(){
     data.date = time(NULL);
     data.level = curLevel;
     strcpy(data.nickName , user.nickName);
-    overWriteHistory(data, pos);
+    overWriteHistory(data);
 
-    printf("You Won!");
+    gotoxy((width-strlen(message))/2, height/2);
+    setcolor(2);
+    printf("%s", message);
+
+    gotoxy((width-strlen(message2))/2, height/2 + 1);
+    setcolor(2);
+    printf("%s%d", message2,Current_Score);
+
+    gotoxy(0 , height + 1);
+
+    usleep(5000000);
+    clear();
+    exit(0);
 }
 void Loser(){
     clear();
@@ -709,13 +731,16 @@ void Loser(){
     data.date = time(NULL);
     data.level = curLevel;
     strcpy(data.nickName , user.nickName);
-    overWriteHistory(data, pos);
+    overWriteHistory(data);
 
     printf("You Failed!");
 }
 void newWave(){
-    if(Wave == 5)
+    if(Time_Period == 1 && head == NULL)
+        Winner();
+    if(Time_Period == 1)
         return;
+
     Wave++;
     FILE* file ;
     srand(time(NULL));
@@ -736,7 +761,7 @@ void newWave(){
             fclose(file);
             break;
         case 2:
-            file = fopen("hard.txt","r");
+            file = fopen("normal.txt","r");
             x = rand()%100;
             for(int i=0;i<10;i++){
                 for(int j=0;j<x;j++){
@@ -749,7 +774,7 @@ void newWave(){
             fclose(file);
             break;
         case 3:
-            file = fopen("long.txt","r");
+            file = fopen("normal.txt","r");
             x = rand()%100;
             for(int i=0;i<10;i++){
                 for(int j=0;j<x;j++){
@@ -762,7 +787,7 @@ void newWave(){
             fclose(file);
             break;
         case 4:
-            file = fopen("long.txt","r");
+            file = fopen("normal.txt","r");
             x = rand()%100;
             for(int i=0;i<10;i++){
                 for(int j=0;j<x;j++){
@@ -775,7 +800,7 @@ void newWave(){
             fclose(file);
             break;
         case 5:
-            file = fopen("long.txt","r");
+            file = fopen("normal.txt","r");
             x = rand()%100;
             for(int i=0;i<10;i++){
                 for(int j=0;j<x;j++){
@@ -788,39 +813,53 @@ void newWave(){
             fclose(file);
             break;
         default:
-            return;
+            file = fopen("normal.txt","r");
+            x = rand()%100;
+            for(int i=0;i<10;i++){
+                for(int j=0;j<x;j++){
+                    fscanf(file,"%s", word);
+                }
+                addWord(word);
+                x = rand()%100;
+                rewind(file);
+            }
+            fclose(file);
+            break;
             break;
     }
 }
-void overWriteHistory(Data data, int pos){
+void overWriteHistory(Data data){
     char tempNickName[20];
     strcpy(tempNickName, user.nickName);
-    FILE* file = fopen(strcat(tempNickName,".bin") , "w+b");
+    FILE* file;
     if(pos==0){
-        fseek(file, 0 , SEEK_END);
+        file = fopen(strcat(tempNickName,".bin") , "ab");
         fwrite(&data,sizeof(Data) , 1 , file);
+        fclose(file);
     }
     else{
-        int count = 0;
-        Data datas[3];
-        while(!feof(file)){
-            fread(&datas[count],sizeof(Data), 1 , file);
-            count++;
+        file = fopen(strcat(tempNickName,".bin") , "rb");
+        Data datas[countOfScores];
+
+        for(int i=0;i<countOfScores;i++){
+            fread(&datas[i] , sizeof(Data) , 1 , file);
         }
-        rewind(file);
+        fclose(file);
+
 
         if(pos == 3)
-            datas[count-1] = data;
+            datas[countOfScores-1] = data;
         else if(pos == 2)
-            datas[count-2] = data;
+            datas[countOfScores-2] = data;
         else if(pos == 1)
-            datas[count-3] = data;
-        for(int i=0;i<count;i++){
+            datas[countOfScores-3] = data;
 
+        file = fopen(tempNickName, "wb");
+        for(int i=0;i<countOfScores;i++){
             fwrite(&datas[i] , sizeof(Data) , 1 , file);
         }
+        fclose(file);
     }
-    fclose(file);
 }
 ////////////////////////////////////////////////////////////
 void createFilesOfWords(){
