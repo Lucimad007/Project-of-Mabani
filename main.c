@@ -41,10 +41,9 @@ User user;
 situation flag = MAIN_MENU;
 FILE* users;
 NodePtr head = NULL;
-int countOfWords = 0;
 int y = 0;   //even empty lines
-int width = 44;
-int height = 26;
+int width = 44;   //global width of in_game
+int height = 26;  //global height of in_game
 int Current_Score = 0;
 double Time_Period = 0;
 int Wave = 0;
@@ -70,6 +69,9 @@ void resetColor();
 void clearDisplay();
 void updateHead();
 void clearHead();
+void showDetails();
+void Winner();
+void Loser();
 void newWave();
 //void isMobham();
 NodePtr createNode();
@@ -88,16 +90,28 @@ int main()
     while(1){
         if(flag!=IN_GAME)
             continue;
+
         while(IN_PROGRESS){}
         IN_PROGRESS = 1;
         clearDisplay();
         y++;
+        if(y>25)
+            {
+                Loser();
+                break;
+            }
         updateDisplay();
         IN_PROGRESS = 0;
         Word_Counter++;
 
         if(Word_Counter == 10){
             newWave();
+
+            while(IN_PROGRESS){}
+            IN_PROGRESS = 1;
+            showDetails();
+            IN_PROGRESS = 0;
+
             if(curLevel == HARD)
                 Time_Period *= 0.6;
             else if(curLevel == MEDIUM)
@@ -107,6 +121,11 @@ int main()
             Word_Counter = 0;
         }
 
+        if(head == NULL)
+        {
+            Winner();
+            break;
+        }
         usleep((Time_Period/10)*10*10*10*10*10*10);   //   /10 because words of waves are 10 and * 10^6 because it should be micro sec
     }
 
@@ -133,8 +152,9 @@ void my_callback_on_key_arrival(char c)
             selectLevelMenu();
         }
     }else if(flag == SELECT_LEVEL){
-
-        FILE* temp = fopen(strcat(user.nickName,".bin"),"rb");
+        char tempNickNmae[20] = "";
+        strcat(tempNickNmae, user.nickName);
+        FILE* temp = fopen(strcat(tempNickNmae,".bin"),"rb");
         switch (c){
             case '1':
                 Wave = 1;
@@ -232,13 +252,21 @@ void my_callback_on_key_arrival(char c)
 
     }else if(flag == GAME){
         createDisplay();
+        showDetails();
         flag = IN_GAME;
     } else if((flag == IN_GAME)&&(head!=NULL)&&(y>1)){
         SizeOfCurrentWord = strlen(head->word);
         char word[20];
         strcpy(word, head->word);
-        if(c == word[Char_Situation])
+        if(c == word[Char_Situation]){
             colors[Char_Situation] = 1;
+            Current_Score++;
+
+            while(IN_PROGRESS){}
+            IN_PROGRESS = 1;
+            showDetails();
+            IN_PROGRESS = 0;
+        }
         else
             colors[Char_Situation] = -1;
         Char_Situation++;
@@ -427,12 +455,11 @@ void Register(){
     gets(temp.password);
 
 
-
+    user = temp;
     gotoxy(0,(HEIGHT)+2);
     FILE* file = fopen("users.bin","ab");
     fwrite(&temp, sizeof(User), 1, file);
 
-    user = temp;
     clear();
     fclose(file);
     return;
@@ -477,7 +504,9 @@ void selectLevelMenu(){
     gotoxy((WIDTH-strlen(str5))/2 , HEIGHT/2 - 2);
     printf("%s",str5);
 
-    FILE* file = fopen(strcat(user.nickName,".bin"),"rb");
+    char tempNickName[20] = "";
+    strcat(tempNickName,".bin");
+    FILE* file = fopen(tempNickName,"rb");
     if((file == NULL) || (file == feof(file))){
         setcolor(7);
         char message[12] = "No History!";
@@ -601,20 +630,52 @@ void createDisplay(){
     setcolor(7);
     for(int i=0;i<=width;i++)
     {
+        if(i%2 == 0)
+            setcolor(4);
+        else
+            setcolor(1);
         gotoxy(i, 0);
         printf("%c",(char)4);
         gotoxy(i, height);
-        printf("%c",(char)4);
+        printf("%c",(char)3);
     }
     for(int i=0;i<=height;i++)
     {
+        if(i%2 == 0)
+            setcolor(4);
+        else
+            setcolor(1);
         gotoxy(0, i);
-        printf("%c",(char)4);
+        printf("%c",(char)5);
         gotoxy(width, i);
-        printf("%c",(char)4);
+        printf("%c",(char)6);
     }
 }
-
+void showDetails(){
+    gotoxy(2, height+2);
+    setcolor(6);
+    printf("Score : %d",Current_Score);
+    gotoxy(2, height+3);
+    setcolor(6);
+    printf("Wave : %d",Wave);
+    gotoxy(20, height+2);
+    setcolor(6);
+    printf("User : %s",user.nickName);
+}
+void Winner(){
+    clear();
+    gotoxy(width/2, height/2);
+    setcolor(2);
+    IN_PROGRESS = 1;
+    printf("You Won!");
+}
+void Loser(){
+    clear();
+    gotoxy(width/2, height/2);
+    setcolor(4);
+    IN_PROGRESS = 1;
+    printf("You Failed!");
+}
 void newWave(){
     if(Wave == 5)
         return;
@@ -759,7 +820,6 @@ void addWord(char word[]){
     if(head==NULL){
         head = createNode();
         strcpy(head->word, word);
-        countOfWords++;
         return;
     }
     NodePtr temp = head;
@@ -768,11 +828,9 @@ void addWord(char word[]){
     head->next = createNode();
     strcpy(head->next->word, word);
     head = temp;
-    countOfWords++;
     return;
 }
 void deleteWord(){
     head = head->next;
-    countOfWords--;
     y--;
 }
