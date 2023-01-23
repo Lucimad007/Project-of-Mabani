@@ -54,6 +54,8 @@ int colors[20];
 Difficulity curLevel;
 int IN_PROGRESS = 0;
 int flag_sit = 0;
+int pos = 0;             //position for over-writing history
+int countOfScores = 0;   //count of scores in user's file
 
 void my_callback_on_key_arrival(char c);
 
@@ -73,6 +75,7 @@ void showDetails();
 void Winner();
 void Loser();
 void newWave();
+void overWriteHistory(Data data, int pos);  //stands for position
 //void isMobham();
 NodePtr createNode();
 void addWord(char word[]);
@@ -184,6 +187,10 @@ void my_callback_on_key_arrival(char c)
                 startButton();
                 break;
             case '4':
+                if(countOfScores < 1)
+                    break;
+                pos = 3;
+
                 if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
@@ -205,6 +212,10 @@ void my_callback_on_key_arrival(char c)
                 }
                 break;
             case '5':
+                if(countOfScores < 2)
+                    break;
+                pos = 2;
+
                 if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
@@ -226,6 +237,10 @@ void my_callback_on_key_arrival(char c)
                 }
                 break;
             case '6':
+                if(countOfScores < 3)
+                    break;
+                pos = 1;
+
                 if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
@@ -543,6 +558,7 @@ void selectLevelMenu(){
             else if(data.level == HARD)
                 printf("hard");
 
+            countOfScores++;
             //fseek(file,(-2)*sizeof(Data),SEEK_CUR);    // i did't use this because i wanted to fix a bug!
             fseek(file,(-1)*sizeof(Data),SEEK_CUR);
             long x = ftell(file);
@@ -674,17 +690,13 @@ void Winner(){
     setcolor(2);
     IN_PROGRESS = 1;
 
-    char tempNickName[20];
-    strcpy(tempNickName, user.nickName);
-    FILE* file = fopen(strcat(tempNickName,".bin") , "a+b");
     Data data;
     data.score = Current_Score;
     data.date = time(NULL);
     data.level = curLevel;
     strcpy(data.nickName , user.nickName);
+    overWriteHistory(data, pos);
 
-    fwrite(&data,sizeof(Data) , 1 , file);
-    fclose(file);
     printf("You Won!");
 }
 void Loser(){
@@ -692,18 +704,13 @@ void Loser(){
     gotoxy(width/2, height/2);
     setcolor(4);
     IN_PROGRESS = 1;
-
-    char tempNickName[20];
-    strcpy(tempNickName, user.nickName);
-    FILE* file = fopen(strcat(tempNickName,".bin") , "a+b");
     Data data;
     data.score = Current_Score;
     data.date = time(NULL);
     data.level = curLevel;
     strcpy(data.nickName , user.nickName);
+    overWriteHistory(data, pos);
 
-    fwrite(&data,sizeof(Data) , 1 , file);
-    fclose(file);
     printf("You Failed!");
 }
 void newWave(){
@@ -784,6 +791,36 @@ void newWave(){
             return;
             break;
     }
+}
+void overWriteHistory(Data data, int pos){
+    char tempNickName[20];
+    strcpy(tempNickName, user.nickName);
+    FILE* file = fopen(strcat(tempNickName,".bin") , "w+b");
+    if(pos==0){
+        fseek(file, 0 , SEEK_END);
+        fwrite(&data,sizeof(Data) , 1 , file);
+    }
+    else{
+        int count = 0;
+        Data datas[3];
+        while(!feof(file)){
+            fread(&datas[count],sizeof(Data), 1 , file);
+            count++;
+        }
+        rewind(file);
+
+        if(pos == 3)
+            datas[count-1] = data;
+        else if(pos == 2)
+            datas[count-2] = data;
+        else if(pos == 1)
+            datas[count-3] = data;
+        for(int i=0;i<count;i++){
+
+            fwrite(&datas[i] , sizeof(Data) , 1 , file);
+        }
+    }
+    fclose(file);
 }
 ////////////////////////////////////////////////////////////
 void createFilesOfWords(){
