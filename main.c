@@ -723,8 +723,12 @@ void Winner(){
 }
 void Loser(){
     clear();
-    gotoxy(width/2, height/2);
-    setcolor(4);
+    char message[12] = "You Failed!";
+    char message2[8] = "Wave : ";
+    char message3[9] = "Score : ";
+    char message4[15] = "Difficulity : ";
+
+
     IN_PROGRESS = 1;
     Data data;
     data.score = Current_Score;
@@ -733,7 +737,28 @@ void Loser(){
     strcpy(data.nickName , user.nickName);
     overWriteHistory(data);
 
-    printf("You Failed!");
+    setcolor(4);
+    gotoxy((width-strlen(message))/2 , height / 2);
+    printf("%s",message);
+    gotoxy((width-strlen(message2))/2 , height / 2 + 1);
+    printf("%s%d",message2,Wave);
+    gotoxy((width-strlen(message3))/2 , height / 2 + 2);
+    printf("%s%d",message3,Current_Score);
+
+    gotoxy((width-strlen(message4))/2 , height / 2 + 3);
+    printf("%s",message4);
+    if(curLevel == EASY)
+        printf("Easy");
+    else if(curLevel == MEDIUM)
+        printf("Medium");
+    else if(curLevel == HARD)
+        printf("Hard");
+
+    gotoxy(0 , height + 1);
+
+    usleep(5000000);
+    clear();
+    exit(0);
 }
 void newWave(){
     if(Time_Period == 1 && head == NULL)
