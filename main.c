@@ -543,7 +543,12 @@ void selectLevelMenu(){
             else if(data.level == HARD)
                 printf("hard");
 
-            fseek(file,(-2)*sizeof(Data),SEEK_CUR);
+            //fseek(file,(-2)*sizeof(Data),SEEK_CUR);    // i did't use this because i wanted to fix a bug!
+            fseek(file,(-1)*sizeof(Data),SEEK_CUR);
+            long x = ftell(file);
+            if(x == 0 || x == 1)
+                break;
+            fseek(file,(-1)*sizeof(Data),SEEK_CUR);
         }
     }
 
