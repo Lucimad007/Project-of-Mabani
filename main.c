@@ -208,7 +208,7 @@ void my_callback_on_key_arrival(char c)
                 if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
-                    fseek(temp, (-1)*sizeof(Data), SEEK_END);
+                    fseek(temp, (-2)*sizeof(Data), SEEK_END);
                     fread(&tempData, sizeof(Data), 1, temp);
                     Wave = 1;
                     Current_Score = tempData.score;
@@ -229,7 +229,7 @@ void my_callback_on_key_arrival(char c)
                 if(!feof(temp) && temp != NULL)
                 {
                     Data tempData;
-                    fseek(temp, (-1)*sizeof(Data), SEEK_END);
+                    fseek(temp, (-3)*sizeof(Data), SEEK_END);
                     fread(&tempData, sizeof(Data), 1, temp);
                     Wave = 1;
                     Current_Score = tempData.score;
@@ -504,9 +504,9 @@ void selectLevelMenu(){
     gotoxy((WIDTH-strlen(str5))/2 , HEIGHT/2 - 2);
     printf("%s",str5);
 
-    char tempNickName[20] = "";
-    strcat(tempNickName,".bin");
-    FILE* file = fopen(tempNickName,"rb");
+    char tempNickName[20];
+    strcpy(tempNickName, user.nickName);
+    FILE* file = fopen(strcat(tempNickName, ".bin"),"rb");
     if((file == NULL) || (file == feof(file))){
         setcolor(7);
         char message[12] = "No History!";
@@ -514,7 +514,7 @@ void selectLevelMenu(){
         printf("%s", message);
         gotoxy(0,HEIGHT+3);
     } else {
-        setcolor(7);
+        setcolor(4);
         Data data;
         gotoxy(3, HEIGHT/2 + 2);
         printf("Score(s)");
@@ -522,6 +522,7 @@ void selectLevelMenu(){
         printf("date(s)");
         gotoxy(46, HEIGHT/2 + 2);
         printf("Difficulity");
+        setcolor(7);
 
         if(!feof(file))
             fseek(file,(-1)*sizeof(Data),SEEK_END);
@@ -667,6 +668,18 @@ void Winner(){
     gotoxy(width/2, height/2);
     setcolor(2);
     IN_PROGRESS = 1;
+
+    char tempNickName[20];
+    strcpy(tempNickName, user.nickName);
+    FILE* file = fopen(strcat(tempNickName,".bin") , "a+b");
+    Data data;
+    data.score = Current_Score;
+    data.date = time(NULL);
+    data.level = curLevel;
+    strcpy(data.nickName , user.nickName);
+
+    fwrite(&data,sizeof(Data) , 1 , file);
+    fclose(file);
     printf("You Won!");
 }
 void Loser(){
@@ -674,6 +687,18 @@ void Loser(){
     gotoxy(width/2, height/2);
     setcolor(4);
     IN_PROGRESS = 1;
+
+    char tempNickName[20];
+    strcpy(tempNickName, user.nickName);
+    FILE* file = fopen(strcat(tempNickName,".bin") , "a+b");
+    Data data;
+    data.score = Current_Score;
+    data.date = time(NULL);
+    data.level = curLevel;
+    strcpy(data.nickName , user.nickName);
+
+    fwrite(&data,sizeof(Data) , 1 , file);
+    fclose(file);
     printf("You Failed!");
 }
 void newWave(){
