@@ -279,6 +279,27 @@ void my_callback_on_key_arrival(char c)
         IN_PROGRESS = 0;
         flag = IN_GAME;
     } else if((flag == IN_GAME)&&(head!=NULL)&&(y>1)){
+        if(c == '\b'){
+            if(Char_Situation>0){
+            if(colors[Char_Situation-1] == 1)
+            {
+                Current_Score--;
+                while(IN_PROGRESS){}
+                IN_PROGRESS = 1;
+                showDetails();
+                IN_PROGRESS = 0;
+            }
+            colors[Char_Situation-1] = 0;
+            Char_Situation--;
+            while(IN_PROGRESS){}
+            IN_PROGRESS = 1;
+            clearHead();
+            updateHead();
+            IN_PROGRESS = 0;
+            }
+            return;
+        }
+        ///////////////////////////////////////
         SizeOfCurrentWord = strlen(head->word);
         char word[20];
         strcpy(word, head->word);
