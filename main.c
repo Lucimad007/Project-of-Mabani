@@ -72,6 +72,7 @@ void resetColor();
 void clearDisplay();
 void updateHead();
 void clearHead();
+void clearDetails();
 void showDetails();
 void Winner();
 void Loser();
@@ -725,7 +726,18 @@ void createDisplay(){
         printf("%c",(char)6);
     }
 }
+void clearDetails(){
+    setcolor(0);
+
+    gotoxy(2, height+2);
+    printf("Score : %d ",Current_Score);    // to prevent program from a bug
+    gotoxy(2, height+3);
+    printf("Wave : %d ",Wave);
+    gotoxy(20, height+2);
+    printf("User : %s ",user.nickName);
+}
 void showDetails(){
+    clearDetails();
     gotoxy(2, height+2);
     setcolor(6);
     printf("Score : %d",Current_Score);
