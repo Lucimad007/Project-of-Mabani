@@ -87,7 +87,7 @@ void deleteWord();
 
 int main()
 {
-   createFilesOfWords();
+   createFilesOfWords();addWord("ali",false);addWord("mmd",true); addWord("mmadi",true);
    MainMenu();
    newWave();   // to add first words and get ready for begining of the game
     HANDLE thread_id = start_listening(my_callback_on_key_arrival);
@@ -302,6 +302,9 @@ void my_callback_on_key_arrival(char c)
             Char_Situation = 0;
             resetColor();
             clearDisplay();
+            if(head->Mobham)
+                Current_Score++;
+            showDetails();
             deleteWord();
             updateDisplay();
             IN_PROGRESS = 0;
@@ -1030,9 +1033,9 @@ void addWord(char word[], bool isMobham){
     head->next = createNode();
     strcpy(head->next->word, word);
     if(isMobham)
-            head->Mobham = true;
+            head->next->Mobham = true;
         else
-            head->Mobham = false;
+            head->next->Mobham = false;
 
     head = temp;
     return;
