@@ -87,7 +87,7 @@ void deleteWord();
 
 int main()
 {
-   createFilesOfWords();addWord("ali",false);addWord("mmd",true); addWord("mmadi",true);
+   createFilesOfWords();
    MainMenu();
    newWave();   // to add first words and get ready for begining of the game
     HANDLE thread_id = start_listening(my_callback_on_key_arrival);
